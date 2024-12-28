@@ -7,18 +7,21 @@
   }; 
   outputs = { self, nixpkgs, ... }: let
     system = "x86_64-linux";
-    types = buildDunePackage rec {
+    pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
+    types = pkgs.ocamlPackages.buildDunePackage rec {
       pname = "types";
       version = "0.0.1";
 
       minimalOCamlVersion = "5.2";
 
-      src = ./src;
+      src = ./.;
 
-      propagatedBuildInputs = [
-        findlib
-        str
-      ];
+      # propagatedBuildInputs = with pkgs; [
+      #   ocamlPackages.str
+      # ];
 
       meta = {
         description = "Haskell-like type classes, but some other features";
@@ -31,6 +34,7 @@
       };
     };
   in {
-    packages.ocaml-types = types;
+    # packages.ocaml-types = types;
+    defaultPackage.x86_64-linux = types;
   };
 }
